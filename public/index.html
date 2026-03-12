@@ -630,24 +630,33 @@
                     });
 
                     y = doc.lastAutoTable.finalY + 8;
-                    //auto add another page if content is reaching the end
-                    const pageHeight = doc.internal.pageSize.height;
 
-                    if (y > pageHeight - 40) {
-                        doc.addPage();
-                        y = 20;
+                    const pageHeight = doc.internal.pageSize.getHeight();
+                    //auto add pages
+                    function ensureSpace(spaceNeeded) {
+                        if (y + spaceNeeded > pageHeight) {
+                            doc.addPage();
+                            y = 20;
+                        }
                     }
 
-                    doc.setFontSize(12); doc.setFont(undefined, "bold");
+                    ensureSpace(10);
+
+                    doc.setFontSize(12);
+                    doc.setFont(undefined, "bold");
                     doc.text("Grand Total:", 140, y);
                     doc.text(`R${grandTotal.toFixed(2)}`, 170, y);
                     doc.setFont("times", "italic");
 
                     y += 12;
+                    ensureSpace(10);
+
                     doc.setFontSize(10);
                     doc.text("Payment terms: 30 days from invoice date.", 20, y);
 
                     y += 10;
+                    ensureSpace(30);
+
                     doc.text("Acceptance:", 20, y);
                     y += 6;
                     doc.text("Name: ____________________", 20, y);
@@ -657,6 +666,8 @@
                     doc.text("Date: ____________________", 20, y);
 
                     y += 10;
+                    ensureSpace(10);
+
                     doc.text("— Generated with MoyoZen Quote Builder —", 60, y);
 
                     setStatus('packing document...');
