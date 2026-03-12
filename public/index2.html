@@ -489,65 +489,79 @@
                     doc.setFont("times", "normal");
 
                     // ---------- logo drawing with max dims, proportionally scaled ----------
-                    const MAX_LOGO_W_MM = 50;
-                    const MAX_LOGO_H_MM = 20;
 
-                    const LOGO_X_MM = 150;
-                    const LOGO_Y_MM = 15;
+                    const MAX_LOGO_W_MM = 50;   // maximum logo width
+                    const MAX_LOGO_H_MM = 20;   // maximum logo height
+                    const TOP_LOGO_Y_MM = 15;   // top Y for the logo
+                    const RIGHT_MARGIN_MM = 20; // right margin from page edge
                     const GAP_AFTER_LOGO_MM = 6;
 
-                    let yStartAfterLogo = 45;
+                    let yStartAfterLogo = 45; // fallback if no logo or error
 
                     if (logoDataUrl) {
                         try {
-
+                            // load image to read natural size
                             const img = new Image();
+                            await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = logoDataUrl; });
 
-                            await new Promise((res, rej) => {
-                                img.onload = res;
-                                img.onerror = rej;
-                                img.src = logoDataUrl;
-                            });
-
-                            const natW = img.naturalWidth;
-                            const natH = img.naturalHeight;
-
-                            let scale = 1;
-
-                            if (natW > natH) {
-                                scale = MAX_LOGO_W_MM / natW;
-                            } else {
-                                scale = MAX_LOGO_H_MM / natH;
+                            // Convert SVG -> PNG if needed (jsPDF prefers raster here)
+                            let dataForPdf = logoDataUrl;
+                            if (img.src.startsWith('data:image/svg+xml') || /\.svg$/i.test(img.src)) {
+                                const canvas = document.createElement('canvas');
+                                canvas.width = img.naturalWidth || 1200;
+                                canvas.height = img.naturalHeight || 300;
+                                const ctx = canvas.getContext('2d');
+                                ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                                dataForPdf = canvas.toDataURL('image/png');
                             }
 
-                            let logoW = natW * scale;
-                            let logoH = natH * scale;
+                            // natural pixel size
+                            const natW = img.naturalWidth || img.width;
+                            const natH = img.naturalHeight || img.height;
+                            if (!natW || !natH) throw new Error('Invalid image dimensions');
 
-                            if (logoW > MAX_LOGO_W_MM) {
-                                const s = MAX_LOGO_W_MM / logoW;
-                                logoW *= s;
-                                logoH *= s;
+                            // 1) compute proportional size to fit inside max box
+                            let logoWmm = MAX_LOGO_W_MM;
+                            let logoHmm = (natH * logoWmm) / natW;
+
+                            // if height too tall, scale down to height limit
+                            if (logoHmm > MAX_LOGO_H_MM) {
+                                const s = MAX_LOGO_H_MM / logoHmm;
+                                logoWmm *= s; logoHmm *= s;
                             }
 
-                            if (logoH > MAX_LOGO_H_MM) {
-                                const s = MAX_LOGO_H_MM / logoH;
-                                logoW *= s;
-                                logoH *= s;
+                            // 2) prevent upscaling beyond approximate native physical size (keeps quality)
+                            // convert native px -> mm approximated by 96 DPI: px * 25.4 / 96
+                            const PX_TO_MM = 25.4 / 96;
+                            const nativeWmm = natW * PX_TO_MM;
+                            if (logoWmm > nativeWmm) {
+                                const s2 = nativeWmm / logoWmm;
+                                logoWmm *= s2; logoHmm *= s2;
                             }
 
-                            doc.addImage(logoDataUrl, "PNG", LOGO_X_MM, LOGO_Y_MM, logoW, logoH);
+                            // figure out page width and compute x so image is flush-right with RIGHT_MARGIN_MM
+                            const pageWidth = doc.internal.pageSize.getWidth(); // in mm
+                            const logoXmm = pageWidth - RIGHT_MARGIN_MM - logoWmm;
+                            const logoYmm = TOP_LOGO_Y_MM;
 
-                            yStartAfterLogo = Math.max(
-                                45,
-                                LOGO_Y_MM + logoH + GAP_AFTER_LOGO_MM
-                            );
+                            // detect mime for addImage (dataForPdf is a dataURL)
+                            let imgType = 'PNG';
+                            if (dataForPdf.startsWith('data:image/jpeg') || dataForPdf.startsWith('data:image/jpg')) imgType = 'JPEG';
+                            else if (dataForPdf.startsWith('data:image/png')) imgType = 'PNG';
 
+                            // draw image
+                            doc.addImage(dataForPdf, imgType, logoXmm, logoYmm, logoWmm, logoHmm);
+
+                            // compute safe y start below logo
+                            yStartAfterLogo = Math.max(45, logoYmm + logoHmm + GAP_AFTER_LOGO_MM);
                         } catch (e) {
-                            console.warn("Logo failed to render", e);
+                            console.warn('PDF logo draw failed — continuing without logo', e);
+                            // keep default yStartAfterLogo
                         }
                     }
 
-                    // now use the computed yStartAfterLogo as the top for your header/body
+                    // after the block, set y from computed value
                     let y = yStartAfterLogo;
 
                     // Header / company block
