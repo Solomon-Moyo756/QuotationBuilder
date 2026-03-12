@@ -6,36 +6,66 @@
     <title>Quotation Builder By Moyozen — PDF</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <style>
+        :root {
+            --bg: #f4f6f8;
+            --card-bg: #fff;
+            --accent: #2c3e50;
+            --muted: #666;
+            --radius: 10px;
+            --gap: 12px;
+            --ui-padding: 16px;
+            --max-width: 920px;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
         body {
             font-family: Inter, Arial, sans-serif;
-            background: #f4f6f8;
-            padding: 28px
+            background: var(--bg);
+            padding: 18px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            color: #222;
+            box-sizing: border-box;
         }
 
         .card {
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 920px;
-            margin: 16px auto;
-            box-shadow: 0 14px 30px rgba(20, 25, 30, 0.06)
+            background: var(--card-bg);
+            padding: var(--ui-padding);
+            border-radius: var(--radius);
+            max-width: var(--max-width);
+            width: 100%;
+            margin: 12px auto;
+            box-shadow: 0 14px 30px rgba(20, 25, 30, 0.06);
+            box-sizing: border-box;
         }
 
         h1 {
-            margin: 0;
-            font-size: 20px
+            margin: 0 0 6px 0;
+            font-size: 18px;
+            color: var(--accent);
+        }
+
+        p.muted {
+            margin: 0 0 10px 0;
+            color: var(--muted);
+            font-size: 13px;
         }
 
         .row {
             display: flex;
+            gap: var(--gap);
             flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 12px
+            align-items: flex-start;
         }
 
         .col {
             flex: 1 1 200px;
-            min-width: 150px
+            min-width: 140px;
         }
 
         input[type="text"],
@@ -44,48 +74,110 @@
         select {
             width: 100%;
             box-sizing: border-box;
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid #e6e9ee
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #e6e9ee;
+            font-size: 14px;
+            background: #fff;
         }
 
-        button {
-            flex: 1 1 100px;
-            min-width: 100px;
-            margin-top: 6px
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 12px;
+        label.small {
             display: block;
-            overflow-x: auto
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 6px;
         }
 
-        th,
-        td {
-            white-space: nowrap
+        .preview-box {
+            width: 100%;
+            max-width: 320px;
+            /* visible on mobile but scales on desktop */
+            height: 110px;
+            border: 1px dashed #d7dbe0;
+            background: #fafafa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            overflow: hidden;
+            padding: 8px;
+            box-sizing: border-box;
         }
 
-        button {
-            background: #2c3e50;
+        #logoPreview {
+            display: none;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 6px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+            background: white;
+        }
+
+        table#items {
+            width: 100%;
+            margin-top: 12px;
+            border-collapse: collapse;
+            display: block;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #efefef;
+            padding: 2px;
+        }
+
+        table#items thead th {
+            background: var(--accent);
+            color: white;
+            padding: 10px 12px;
+            text-align: left;
+            font-size: 13px;
+            min-width: 90px;
+        }
+
+        table#items td {
+            padding: 10px 12px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f4f4f4;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        table#items input {
+            margin: 0;
+            font-size: 14px;
+            padding: 8px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .controls button {
+            background: var(--accent);
             color: white;
             border: none;
-            padding: 10px 14px;
-            border-radius: 8px;
-            cursor: pointer
+            padding: 12px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            min-width: 120px;
         }
 
-        .muted {
-            color: #666;
-            font-size: 13px
+        .controls button.secondary {
+            background: #f4f6f8;
+            color: var(--accent);
+            border: 1px solid #e6e9ee;
         }
 
         .status {
             margin-top: 12px;
             font-size: 13px;
-            color: #333
+            color: var(--muted);
         }
 
         .debug {
@@ -95,146 +187,83 @@
             background: #fafafa;
             padding: 8px;
             border-radius: 6px;
-            border: 1px solid #eee
-        }
-
-        label.small {
-            display: block;
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 6px
-        }
-
-        #logoPreview {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
+            border: 1px solid #eee;
             display: none;
-            margin: 0 auto;
-            /* centers horizontally */
-            padding: 4px;
-            /* optional: some breathing space */
-            box-sizing: border-box;
         }
 
-        @media (max-width:480px) {
+        /* mobile-first behaviour */
+        @media (max-width:640px) {
+            body {
+                padding: 12px;
+            }
+
+            .card {
+                padding: 14px;
+                margin: 8px;
+            }
+
+            .controls button {
+                width: 100%;
+                min-width: 0;
+            }
+
+            table#items td,
+            table#items thead th {
+                white-space: normal;
+                font-size: 14px;
+            }
+
+            .preview-box {
+                max-width: 100%;
+                height: 90px;
+            }
+
+            input[type="text"],
+            select {
+                padding: 12px;
+                font-size: 15px;
+            }
+
             .row {
-                flex-direction: column
+                gap: 10px;
             }
 
             .col {
-                min-width: 100%
-            }
-
-            button {
-                width: 100%;
-                margin-top: 8px
-            }
-
-            #items {
-                font-size: 14px
+                min-width: 100%;
             }
         }
 
-        /* PDF template styles (keep them here so the generated HTML looks the same) */
-        .pdf-wrap {
-            font-family: Arial, Helvetica, sans-serif;
-            color: #222;
-            padding: 28px;
+        /* slightly larger screen polish */
+        @media (min-width:641px) and (max-width:1024px) {
+            .controls button {
+                flex: 1;
+            }
+
+            table#items td {
+                font-size: 13px;
+            }
+
+            .preview-box {
+                max-width: 280px;
+            }
         }
 
-        .pdf-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 18px;
-        }
-
-        .pdf-company {
-            font-size: 22px;
-            color: #2C3E50;
-            font-weight: 700;
-        }
-
-        .pdf-contact {
-            font-size: 12px;
-            color: #2C3E50;
-        }
-
-        .pdf-client {
-            background: #fbfdff;
-            padding: 10px;
-            border: 1px solid #eef6fb;
-            border-radius: 6px;
-            margin-bottom: 16px;
-        }
-
-        .pdf-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin: 8px 0 16px;
-        }
-
-        .pdf-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 8px;
-            font-size: 12px;
-        }
-
-        .pdf-table th {
-            background: #2c3e50;
-            color: #fff;
-            padding: 8px;
-            text-align: left;
-        }
-
-        .pdf-table td {
-            padding: 8px;
-            border-bottom: 1px solid #eee;
-            vertical-align: top;
-        }
-
-        .pdf-grand {
-            background: #E9E9E9;
-            font-weight: 700;
-            font-size: 16px;
-            padding: 8px;
-        }
-
-        .pdf-footer {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #444;
-        }
-
-        .pdf-brand {
-            text-align: center;
-            color: #888;
-            font-style: italic;
-            margin-top: 24px;
-            font-size: 11px;
-        }
-
-        .pdf-accept {
-            margin-top: 22px;
-        }
-
-        .logo-img {
-            max-width: 240px;
-            max-height: 80px;
-            object-fit: contain;
+        /* focus accessibility */
+        input:focus,
+        select:focus,
+        button:focus {
+            outline: 3px solid rgba(44, 62, 80, 0.12);
+            outline-offset: 2px;
         }
     </style>
 </head>
 
 <body>
-    <div class="card">
+    <div class="card" role="main">
         <h1>Build your Quotation</h1>
-        <p class="muted">fill in this beautiful form to create your quotation in a few seconds</p>
+        <p class="muted">Fill in the form and tap <strong>Generate Quote</strong> to create PDF.</p>
 
-        <div class="row">
+        <div class="row" style="margin-bottom:8px">
             <div class="col"><input id="company" type="text" placeholder="Company name" value="Moyo Zen Construction" />
             </div>
             <div style="width:220px"><input id="date" type="text" placeholder="Date (optional - auto generated)" />
@@ -242,7 +271,7 @@
             <div style="width:220px"><input id="quoteNo" type="text" placeholder="Quote No (optional)" /></div>
         </div>
 
-        <div class="row" style="margin-top:8px">
+        <div class="row" style="margin-top:6px">
             <div class="col">
                 <label class="small">Company Phone</label>
                 <input id="companyPhone" type="text" placeholder="e.g. 079 684 8598" value="079 684 8598" />
@@ -253,24 +282,24 @@
             </div>
         </div>
 
-        <div style="margin-top:12px; display:flex; gap:12px; align-items:center;">
-            <div style="flex:1">
-                <label class="small">Company Logo (optional) - i.e your image size will affect your output</label>
+        <div style="display:flex; gap:12px; align-items:center; margin-top:12px; flex-wrap:wrap;">
+            <div style="flex:1; min-width:180px;">
+                <label class="small">Company Logo (optional)</label>
                 <input id="logoFile" type="file" accept="image/*" />
             </div>
-            <div
-                style="width: 300px; height: 100px; border: 1px dashed #ccc; background:#f9f9f9; margin-top:6px; display:flex; align-items:center; justify-content:center;">
+
+            <div class="preview-box" aria-hidden="false" title="Logo preview">
                 <img id="logoPreview" src="" alt="logo preview" />
             </div>
         </div>
 
         <div style="margin-top:14px; border-radius:8px; padding:10px; background:#fbfdff; border:1px solid #eef6fb">
-            <div style="display:flex; gap:12px;">
-                <div style="flex:1">
+            <div class="row">
+                <div class="col">
                     <label class="small">Client Name</label>
                     <input id="clientName" type="text" placeholder="Client full name or company" />
                 </div>
-                <div style="flex:1">
+                <div class="col">
                     <label class="small">Client Phone / Email</label>
                     <input id="clientContact" type="text" placeholder="Phone or email" />
                 </div>
@@ -281,23 +310,26 @@
             </div>
         </div>
 
-        <table id="items" aria-label="items">
-            <tr>
-                <th style="width:46%">Description</th>
-                <th style="width:12%">Quantity</th>
-                <th style="width:12%">Measure</th>
-                <th style="width:12%">Price</th>
-            </tr>
+        <table id="items" aria-label="items" role="table">
+            <thead>
+                <tr>
+                    <th style="width:46%">Description</th>
+                    <th style="width:12%">Quantity</th>
+                    <th style="width:12%">Measure</th>
+                    <th style="width:12%">Price</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
         </table>
 
-        <div style="display:flex; gap:10px; margin-top:14px">
+        <div class="controls" style="margin-top:14px">
             <button id="addRowBtn">Add Item</button>
-            <button id="autoTestBtn">Auto Test</button>
+            <button id="autoTestBtn" class="secondary">Auto Test</button>
             <button id="generateBtn">Generate Quote</button>
         </div>
 
         <div id="status" class="status">Status: ready</div>
-        <div id="debug" class="debug" style="display:none"></div>
+        <div id="debug" class="debug" aria-hidden="true"></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -308,106 +340,58 @@
             const debugEl = document.getElementById('debug');
             const logoFileInput = document.getElementById('logoFile');
             const logoPreview = document.getElementById('logoPreview');
+            const tbody = document.querySelector('#items tbody');
             const setStatus = t => { statusEl.textContent = 'Status: ' + t; console.log('[STATUS]', t); };
             const showDebug = t => { debugEl.style.display = 'block'; debugEl.textContent = t; console.log('[DEBUG]', t); };
 
-            // helpers
             const $ = id => document.getElementById(id);
             const formatCurrency = v => `R${Number(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
             function addRow() {
-                const table = $('items');
-                const row = table.insertRow();
+                const row = document.createElement('tr');
                 row.innerHTML = `
-        <td><input placeholder="Description" type="text"></td>
-        <td><input placeholder="Quantity" type="number" step="any"></td>
-        <td>
-          <select class="measure">
-            <option value="">--</option>
-            <option value="m²">m²</option>
-            <option value="m">m</option>
-            <option value="each">each</option>
-            <option value="set">set</option>
-            <option value="lot">lot</option>
-            <option value="hr">hr</option>
-            <option value="day">day</option>
-            <option value="kg">kg</option>
-          </select>
-        </td>
-        <td><input placeholder="Price (per unit)" type="number" step="any"></td>
-      `;
+          <td><input placeholder="Description" type="text"></td>
+          <td><input placeholder="Quantity" type="number" step="any"></td>
+          <td>
+            <select class="measure">
+              <option value="">--</option>
+              <option value="m²">m²</option>
+              <option value="m">m</option>
+              <option value="each">each</option>
+              <option value="set">set</option>
+              <option value="lot">lot</option>
+              <option value="hr">hr</option>
+              <option value="day">day</option>
+              <option value="kg">kg</option>
+            </select>
+          </td>
+          <td><input placeholder="Price (per unit)" type="number" step="any"></td>
+        `;
+                tbody.appendChild(row);
                 return row;
             }
 
-            // unified unit formatter
-            function formatUnit(qty, unit) {
+            function formatQuantity(qty, unit) {
                 if (!unit) return `${qty}`;
                 unit = unit.toLowerCase();
-
-                const neverPlural = ["each"];
-                if (neverPlural.includes(unit)) return `${qty} ${unit}`;
-
-                const pluralMap = {
-                    "day": "days", "hr": "hrs", "hour": "hrs",
-                    "lot": "lots", "set": "sets", "sheet": "sheets",
-                    "m²": "m²", "m2": "m²"
-                };
-                const displayUnit = (qty !== 1 && pluralMap[unit]) ? pluralMap[unit] : unit;
-                return `${qty} ${displayUnit}`;
-            }
-
-            function formatQuantity(qty, unit) {
-                if (!unit) return qty;
-
-                unit = unit.toLowerCase();
-
                 const attachToQty = ["m²", "m", "kg", "hr", "day"];
-
-                if (attachToQty.includes(unit)) {
-
-                    const pluralMap = {
-                        "day": "days", "hr": "hrs", "hour": "hrs",
-                        "lot": "lots", "set": "sets", "sheet": "sheets",
-                        "m²": "m²", "m2": "m²"
-                    };
-
-                    const displayUnit = (qty !== 1 && pluralMap[unit]) ? pluralMap[unit] : unit;
-
-                    return `${qty} ${displayUnit}`;
-                }
-
-                return qty; // for each, set, lot
+                const plurals = { "day": "days", "hr": "hrs", "hour": "hrs", "lot": "lots", "set": "sets" };
+                const displayUnit = (qty !== 1 && plurals[unit]) ? plurals[unit] : unit;
+                if (attachToQty.includes(unit)) return `${qty} ${displayUnit}`;
+                return `${qty}`;
             }
-
 
             function formatPrice(price, unit) {
                 if (!unit) return `R${price.toFixed(2)}`;
-
                 unit = unit.toLowerCase();
-
                 const wordUnits = ["each", "set", "lot"];
-
-                if (wordUnits.includes(unit)) {
-                    return `R${price.toFixed(2)} ${unit}`;
-                }
-
+                if (wordUnits.includes(unit)) return `R${price.toFixed(2)} ${unit}`;
                 return `R${price.toFixed(2)}/${unit}`;
             }
 
-            // convert file -> dataURL
-            function fileToDataURL(file) {
-                return new Promise((resolve, reject) => {
-                    const r = new FileReader();
-                    r.onload = e => resolve(e.target.result);
-                    r.onerror = reject;
-                    r.readAsDataURL(file);
-                });
-            }
-
-            // logo preview
-            // preview + consistent scaling to match PDF mm -> px
+            // --- Preview scaling — exact mm -> px conversion so preview matches PDF scaling
             const LOGO_WIDTH_MM = 50;
-            const PX_PER_MM = 96 / 25.4; // CSS px per mm ≈ 3.7795
+            const PX_PER_MM = 96 / 25.4; // CSS pixels per mm (~3.78)
             logoFileInput.addEventListener('change', async () => {
                 const f = logoFileInput.files && logoFileInput.files[0];
                 if (!f) {
@@ -419,14 +403,12 @@
                 const url = URL.createObjectURL(f);
                 const img = new Image();
                 img.onload = () => {
-                    const pdfLogoWidthMM = 50; // PDF width in mm
-                    const pdfScale = 2;        // approx pixels per mm
-                    const previewWidth = pdfLogoWidthMM * pdfScale;
-                    const previewHeight = (img.height * previewWidth) / img.width;
+                    const previewWidthPx = Math.round(LOGO_WIDTH_MM * PX_PER_MM);
+                    const previewHeightPx = Math.round((img.naturalHeight * previewWidthPx) / img.naturalWidth);
 
-                    logoPreview.style.width = `${previewWidth}px`;
-                    logoPreview.style.height = `${previewHeight}px`;
-                    logoPreview.src = img.src;
+                    logoPreview.style.width = previewWidthPx + 'px';
+                    logoPreview.style.height = previewHeightPx + 'px';
+                    logoPreview.src = url;
                     logoPreview.style.display = 'block';
                 };
                 img.onerror = (e) => {
@@ -438,8 +420,7 @@
 
             $('addRowBtn').addEventListener('click', () => { addRow(); setStatus('row added'); });
             $('autoTestBtn').addEventListener('click', () => {
-                const table = $('items');
-                while (table.rows.length > 1) table.deleteRow(1);
+                tbody.innerHTML = '';
                 const r1 = addRow(); const i1 = r1.querySelectorAll('input'); i1[0].value = 'Install Wall Panels'; i1[1].value = '5.76'; r1.querySelector("select").value = "m²"; i1[2].value = 290.50;
                 const r2 = addRow(); const i2 = r2.querySelectorAll('input'); i2[0].value = 'Install Marble/MDF Sheet'; i2[1].value = '1'; r2.querySelector("select").value = "each"; i2[2].value = 250.00;
                 setStatus('sample rows added');
@@ -458,260 +439,185 @@
                     const clientAddressVal = $('clientAddress').value.trim() || '';
 
                     // read rows
-                    const rows = document.querySelectorAll('#items tr');
+                    const rows = document.querySelectorAll('#items tbody tr');
                     const items = [];
-                    rows.forEach((row, i) => {
-                        if (i === 0) return;
+                    rows.forEach((row) => {
                         const inputs = row.querySelectorAll('input');
                         const select = row.querySelector('select');
                         const desc = (inputs[0].value || '').trim();
                         if (!desc) return;
                         const qty = parseFloat(inputs[1].value) || 0;
                         const unit = (select && select.value) ? select.value.trim() : '';
-                        // price is last input in row
-                        const price = parseFloat(inputs[2].value) || 0;
+                        const price = parseFloat(inputs[2].value) || 0; // after change: price at index 3
                         items.push({ desc, qty, unit, price });
                     });
 
                     if (!items.length) { setStatus('no items — add rows or auto test'); return; }
 
-                    // prepare logo dataURL if present
+                    // embed logo dataURL if present
                     let logoDataUrl = null;
-                    const logoFile = logoFileInput.files && logoFileInput.files[0];
-                    if (logoFile) {
+                    const file = logoFileInput.files && logoFileInput.files[0];
+                    if (file) {
                         try {
                             setStatus('embedding logo...');
-                            logoDataUrl = await fileToDataURL(logoFile);
+                            logoDataUrl = await new Promise((resolve, reject) => {
+                                const r = new FileReader();
+                                r.onload = e => resolve(e.target.result);
+                                r.onerror = reject;
+                                r.readAsDataURL(file);
+                            });
                         } catch (e) {
                             console.warn('logo read failed', e);
                             showDebug('Logo read failed — continuing without logo:\n' + (e.stack || e));
                         }
                     }
 
-                    // build table html rows & grand total
+                    // build tableRows
                     let grandTotal = 0;
-                    let rowsHtml = '';
-                    items.forEach((it, idx) => {
-                        const qtyDisplay = it.unit ? formatUnit(it.qty, it.unit) : `${it.qty}`;
-                        const priceDisplay = it.unit ? `${formatCurrency(it.price)}/${it.unit}` : `${formatCurrency(it.price)}`;
+                    const tableRows = [];
+                    items.forEach(it => {
                         const total = it.qty * it.price;
                         grandTotal += total;
-                        // alternate shading for readability
-                        const bg = (idx % 2 === 1) ? ' style="background:#F7F7F7"' : '';
-                        rowsHtml += `<tr${bg}>
-            <td style="padding:8px">${escapeHtml(it.desc)}</td>
-            <td style="padding:8px; text-align:center">${escapeHtml(qtyDisplay)}</td>
-            <td style="padding:8px; text-align:right">${escapeHtml(priceDisplay)}</td>
-            <td style="padding:8px; text-align:right"> ${formatCurrency(total)}</td>
-          </tr>`;
+                        const qtyDisplay = formatQuantity(it.qty, it.unit);
+                        const priceDisplay = formatPrice(it.price, it.unit);
+                        tableRows.push([it.desc, qtyDisplay, priceDisplay, `R${total.toFixed(2)}`]);
                     });
+
+                    // create PDF
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF();
                     doc.setFont("times", "normal");
-                    // Fixed logo position and size
-                    // ===== draw logo into PDF, matching preview scaling =====
-                    const MAX_LOGO_W_MM = 50; // maximum logo width in mm
-                    const MAX_LOGO_H_MM = 20; // maximum logo height in mm
-                    const LOGO_X_MM = 150;    // x position in mm (right side)
-                    const LOGO_Y_MM = 15;     // y position in mm (top)
-                    const GAP_AFTER_LOGO_MM = 6; // gap under logo before heading starts
 
-                    let yStartAfterLogo = 45; // default fallback if logo not present or fails
+                    // ---------- logo drawing with max dims, proportionally scaled ----------
+                    const MAX_LOGO_W_MM = 50;
+                    const MAX_LOGO_H_MM = 20;
+
+                    const LOGO_X_MM = 150;
+                    const LOGO_Y_MM = 15;
+                    const GAP_AFTER_LOGO_MM = 6;
+
+                    let yStartAfterLogo = 45;
 
                     if (logoDataUrl) {
                         try {
-                            // load image into <img> to read natural size and handle SVG->PNG if needed
+
                             const img = new Image();
+
                             await new Promise((res, rej) => {
                                 img.onload = res;
                                 img.onerror = rej;
                                 img.src = logoDataUrl;
                             });
 
-                            // if the source is an SVG (data: or file), convert it to PNG on a canvas for jsPDF
-                            let dataForPdf = logoDataUrl;
-                            if (img.src.startsWith('data:image/svg+xml') || /\.svg$/i.test(img.src)) {
-                                const canvas = document.createElement('canvas');
-                                // use natural size or constrain to something reasonable to keep quality
-                                canvas.width = img.naturalWidth || 800;
-                                canvas.height = img.naturalHeight || 200;
-                                const ctx = canvas.getContext('2d');
-                                // white background (optional)
-                                ctx.fillStyle = '#ffffff';
-                                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                                dataForPdf = canvas.toDataURL('image/png');
+                            const natW = img.naturalWidth;
+                            const natH = img.naturalHeight;
+
+                            let scale = 1;
+
+                            if (natW > natH) {
+                                scale = MAX_LOGO_W_MM / natW;
+                            } else {
+                                scale = MAX_LOGO_H_MM / natH;
                             }
 
-                            // natural pixel dimensions
-                            const natW = img.naturalWidth || img.width;
-                            const natH = img.naturalHeight || img.height;
+                            let logoW = natW * scale;
+                            let logoH = natH * scale;
 
-                            // 1) target width = MAX_LOGO_W_MM, compute height to keep aspect ratio
-                            let logoWmm = MAX_LOGO_W_MM;
-                            let logoHmm = (natH * logoWmm) / natW;
-
-                            // 2) if height exceeds max, scale down to fit max height
-                            if (logoHmm > MAX_LOGO_H_MM) {
-                                const s = MAX_LOGO_H_MM / logoHmm;
-                                logoWmm = logoWmm * s;
-                                logoHmm = logoHmm * s;
+                            if (logoW > MAX_LOGO_W_MM) {
+                                const s = MAX_LOGO_W_MM / logoW;
+                                logoW *= s;
+                                logoH *= s;
                             }
 
-                            // 3) Prevent upscaling above the image's "native size in mm"
-                            // approximate native mm size from pixels using 96 DPI (CSS) => px -> mm: px * 25.4 / 96
-                            const PX_TO_MM = 25.4 / 96;
-                            const nativeWmm = natW * PX_TO_MM;
-                            if (logoWmm > nativeWmm) {
-                                const s2 = nativeWmm / logoWmm;
-                                logoWmm = logoWmm * s2;
-                                logoHmm = logoHmm * s2;
+                            if (logoH > MAX_LOGO_H_MM) {
+                                const s = MAX_LOGO_H_MM / logoH;
+                                logoW *= s;
+                                logoH *= s;
                             }
 
-                            // detect image type for jsPDF addImage
-                            let imgType = 'PNG';
-                            if (dataForPdf.startsWith('data:image/jpeg') || dataForPdf.startsWith('data:image/jpg')) imgType = 'JPEG';
-                            else if (dataForPdf.startsWith('data:image/png')) imgType = 'PNG';
+                            doc.addImage(logoDataUrl, "PNG", LOGO_X_MM, LOGO_Y_MM, logoW, logoH);
 
-                            // finally, draw the image into the PDF
-                            doc.addImage(dataForPdf, imgType, LOGO_X_MM, LOGO_Y_MM, logoWmm, logoHmm);
+                            yStartAfterLogo = Math.max(
+                                45,
+                                LOGO_Y_MM + logoH + GAP_AFTER_LOGO_MM
+                            );
 
-                            // compute a safe start y for the rest of the header (logo bottom + gap)
-                            yStartAfterLogo = Math.max(45, LOGO_Y_MM + logoHmm + GAP_AFTER_LOGO_MM);
                         } catch (e) {
-                            console.warn('PDF logo draw failed — skipping logo', e);
-                            showDebug && showDebug('PDF logo draw failed — continuing without logo:\n' + (e.stack || e));
-                            // keep default yStartAfterLogo
+                            console.warn("Logo failed to render", e);
                         }
                     }
 
                     // now use the computed yStartAfterLogo as the top for your header/body
                     let y = yStartAfterLogo;
 
-                    // Company Name
-                    doc.setFont("times", "bold");
-                    doc.setFontSize(22);
+                    // Header / company block
+                    doc.setFont("times", "bold"); doc.setFontSize(22); doc.setTextColor(44, 62, 80);
                     doc.text(company, 20, y);
+                    doc.setFont("times", "italic"); doc.setFontSize(10);
+                    if (companyPhone) doc.text(`Phone: ${companyPhone}`, 20, y + 8);
+                    if (companyEmail) doc.text(`Email: ${companyEmail}`, 20, y + 14);
 
-                    // Company contact info
-                    doc.setFont("times", "italic");
-                    doc.setFontSize(10);
-                    doc.text(`Phone: ${companyPhone}`, 20, y + 8);
-                    doc.text(`Email: ${companyEmail}`, 20, y + 14);
+                    // Quote meta box
+                    const metaW = 60, metaH = 28;
+                    const pageWidth = doc.internal.pageSize.getWidth();
+                    const metaX = pageWidth - metaW - 20;
+                    const metaY = y - 14;
+                    doc.setFillColor(237, 241, 245); doc.setDrawColor(200);
+                    doc.rect(metaX, metaY, metaW, metaH, "F");
+                    doc.setFont("times", "bold"); doc.setFontSize(10); doc.setTextColor(20, 20, 20);
+                    doc.text("QUOTE", metaX + 6, metaY + 8);
+                    doc.setFont("times", "normal"); doc.setFontSize(9);
+                    doc.text(`Date: ${dateStr}`, metaX + 6, metaY + 15);
+                    doc.text(`No: ${quoteNo}`, metaX + 6, metaY + 22);
 
-                    // Quote info box (right side)
-                    doc.setDrawColor(200);
-                    doc.setFillColor(245, 245, 245);
-                    doc.rect(140, y - 6, 50, 24, "F");
+                    // client box
+                    y = Math.max(y + 8, metaY + metaH + 6);
+                    const clientBoxX = 20, clientBoxW = pageWidth - clientBoxX * 2, clientBoxY = y;
+                    doc.setFillColor(251, 253, 255); doc.setDrawColor(236, 245, 252);
+                    doc.rect(clientBoxX, clientBoxY, clientBoxW, 38, "F");
 
-                    doc.setFont(undefined, "bold");
-                    doc.setFontSize(10);
-                    doc.text("QUOTE", 145, y);
+                    doc.setFont("times", "bold"); doc.setFontSize(12); doc.setTextColor(20, 20, 20);
+                    doc.text("Client Information", clientBoxX + 6, clientBoxY + 10);
 
-                    doc.setFont("times", "italic");
-                    doc.text(`Date: ${dateStr}`, 145, y + 8);
-                    doc.text(`No: ${quoteNo}`, 145, y + 14);
+                    let lineY = clientBoxY + 18;
+                    doc.setFont("times", "italic"); doc.setFontSize(10); doc.setTextColor(120);
+                    doc.text("Client Name:", clientBoxX + 6, lineY);
+                    doc.setFont("times", "bold"); doc.setTextColor(20, 20, 20);
+                    doc.text(clientNameVal || "____________________", clientBoxX + 72, lineY);
 
-                    // 5️⃣ quote info box
-                    doc.setDrawColor(200);
-                    doc.setFillColor(245, 245, 245);
-                    doc.rect(140, y - 6, 50, 24, "F");
+                    lineY += 7;
+                    doc.setFont("times", "italic"); doc.setTextColor(120);
+                    doc.text("Contact:", clientBoxX + 6, lineY);
+                    doc.setFont("times", "bold"); doc.setTextColor(20, 20, 20);
+                    doc.text(clientContactVal || "____________________", clientBoxX + 72, lineY);
 
-                    doc.setFontSize(10);
-                    doc.setFont(undefined, "bold");
-                    doc.text("QUOTE", 145, y);
+                    lineY += 8;
+                    doc.setFont("times", "italic"); doc.setTextColor(120);
+                    doc.text("Address:", clientBoxX + 6, lineY);
+                    doc.setFont("times", "bold"); doc.setTextColor(20, 20, 20);
+                    const addressLines = doc.splitTextToSize(clientAddressVal || "____________________", clientBoxW - (clientBoxX + 72 - clientBoxX) - 8);
+                    doc.text(addressLines, clientBoxX + 72, lineY);
 
-                    doc.setFont("times", "italic");
-                    doc.text(`Date: ${dateStr}`, 145, y + 8);
-                    doc.text(`No: ${quoteNo}`, 145, y + 14);
+                    y = clientBoxY + 38 + (addressLines.length - 1) * 6 + 6;
 
-                    // 6️⃣ move y below header for next section
-                    y += 28;
-
-                    // Client info box
-                    doc.setFillColor(250, 252, 255);
-                    doc.rect(20, y, 170, 40, "F");
-
-                    doc.setFont("times", "bold");
-                    doc.setFontSize(13);
-                    doc.text("Client Information", 25, y + 8);
-
-                    doc.setFontSize(10);
-
-                    // Client Name
-                    doc.setFont("times", "italic");
-                    doc.text("Client Name:", 25, y + 16);
-
-                    doc.setFont(undefined, "bold");
-                    doc.text(clientNameVal || "-", 70, y + 16);
-
-                    // Contact
-                    doc.setFont("times", "italic");
-                    doc.text("Contact:", 25, y + 22);
-
-                    doc.setFont(undefined, "bold");
-                    doc.text(clientContactVal || "-", 70, y + 22);
-
-                    // Address (auto wrapped)
-                    doc.setFont("times", "italic");
-                    doc.text("Address:", 25, y + 28);
-
-                    doc.setFont(undefined, "bold");
-
-                    const addressLines = doc.splitTextToSize(clientAddressVal || "-", 110);
-                    doc.text(addressLines, 70, y + 28);
-
-                    y += 40 + (addressLines.length - 1) * 6;
-
-                    doc.setFontSize(14);
+                    // Quotation title and table using autoTable
+                    doc.setFontSize(14); doc.setFont("times", "bold");
                     doc.text("Quotation", 20, y);
                     y += 6;
-
-                    const tableRows = [];
-                    grandTotal = 0;
-
-                    items.forEach(item => {
-                        const total = item.qty * item.price;
-                        grandTotal += total;
-
-                        const qtyDisplay = formatQuantity(item.qty, item.unit);
-                        const priceDisplay = formatPrice(item.price, item.unit);
-
-                        tableRows.push([
-                            item.desc,
-                            qtyDisplay,
-                            priceDisplay,
-                            `R${total.toFixed(2)}`
-                        ]);
-                    });
 
                     doc.autoTable({
                         startY: y,
                         head: [["Description", "Quantity", "Price Each", "Total"]],
                         body: tableRows,
                         theme: "grid",
-                        headStyles: {
-                            fillColor: [44, 62, 80],
-                            textColor: 255,
-                            fontSize: 11
-                        },
-                        styles: {
-                            font: "times",
-                            fontSize: 10,
-                            cellPadding: 5
-                        },
-                        columnStyles: {
-                            1: { halign: "center" },
-                            2: { halign: "right" },
-                            3: { halign: "right" }
-                        }
+                        headStyles: { fillColor: [44, 62, 80], textColor: 255, fontSize: 11 },
+                        styles: { font: "times", fontSize: 10, cellPadding: 5 },
+                        columnStyles: { 1: { halign: "center" }, 2: { halign: "right" }, 3: { halign: "right" } }
                     });
 
                     y = doc.lastAutoTable.finalY + 8;
 
-                    y += 4;
-                    doc.setFontSize(12);
-                    doc.setFont(undefined, "bold");
+                    doc.setFontSize(12); doc.setFont(undefined, "bold");
                     doc.text("Grand Total:", 140, y);
                     doc.text(`R${grandTotal.toFixed(2)}`, 170, y);
                     doc.setFont("times", "italic");
@@ -733,8 +639,6 @@
                     doc.text("— Generated with MoyoZen Quote Builder —", 60, y);
 
                     doc.save(`quote_${new Date().toISOString().slice(0, 10)}.pdf`);
-
-                    // cleanup
                     setStatus('PDF generated — check downloads folder');
 
                 } catch (err) {
@@ -744,7 +648,7 @@
                 }
             });
 
-            // small helpers
+            // escape helper
             function escapeHtml(s) {
                 if (!s && s !== 0) return '';
                 return String(s).replace(/[&<>"']/g, function (m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]; });
@@ -752,7 +656,6 @@
 
             addRow();
             setStatus('ready — add rows or use Auto Test, then Generate Quote');
-
         })();
     </script>
 </body>
