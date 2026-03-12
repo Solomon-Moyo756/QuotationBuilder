@@ -264,7 +264,7 @@
         <p class="muted">Fill in the form and tap <strong>Generate Quote</strong> to create PDF.</p>
 
         <div class="row" style="margin-bottom:8px">
-            <div class="col"><input id="company" type="text" placeholder="Company name" value="Moyo Zen Construction" />
+            <div class="col"><input id="company" type="text" placeholder="Company name" />
             </div>
             <div style="width:220px"><input id="date" type="text" placeholder="Date (optional - auto generated)" />
             </div>
@@ -274,11 +274,11 @@
         <div class="row" style="margin-top:6px">
             <div class="col">
                 <label class="small">Company Phone</label>
-                <input id="companyPhone" type="text" placeholder="e.g. 079 684 8598" value="079 684 8598" />
+                <input id="companyPhone" type="text" placeholder="e.g. 079 684 8598" />
             </div>
             <div class="col">
                 <label class="small">Company Email</label>
-                <input id="companyEmail" type="text" placeholder="e.g. info@moyozen.co.za" value="info@moyozen.co.za" />
+                <input id="companyEmail" type="text" placeholder="e.g. info@moyozen.co.za" />
             </div>
         </div>
 
@@ -630,6 +630,13 @@
                     });
 
                     y = doc.lastAutoTable.finalY + 8;
+                    //auto add another page if content is reaching the end
+                    const pageHeight = doc.internal.pageSize.height;
+
+                    if (y > pageHeight - 40) {
+                        doc.addPage();
+                        y = 20;
+                    }
 
                     doc.setFontSize(12); doc.setFont(undefined, "bold");
                     doc.text("Grand Total:", 140, y);
@@ -652,7 +659,20 @@
                     y += 10;
                     doc.text("— Generated with MoyoZen Quote Builder —", 60, y);
 
-                    doc.save(`quote_${new Date().toISOString().slice(0, 10)}.pdf`);
+                    setStatus('packing document...');
+
+                    const blob = doc.output('blob');
+                    const url = URL.createObjectURL(blob);
+
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `quote_${(new Date()).toISOString().slice(0, 10)}.pdf`;
+
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+
+                    setStatus('download started — check your downloads folder');
                     setStatus('PDF generated — check downloads folder');
 
                 } catch (err) {
