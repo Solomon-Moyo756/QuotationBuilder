@@ -107,11 +107,14 @@
 
         #logoPreview {
             max-width: 100%;
-            max-height: 60px;
+            max-height: 100%;
             object-fit: contain;
             display: none;
-            border-radius: 4px;
-            margin-top: 6px
+            margin: 0 auto;
+            /* centers horizontally */
+            padding: 4px;
+            /* optional: some breathing space */
+            box-sizing: border-box;
         }
 
         @media (max-width:480px) {
@@ -255,10 +258,9 @@
                 <label class="small">Company Logo (optional) - i.e your image size will affect your output</label>
                 <input id="logoFile" type="file" accept="image/*" />
             </div>
-            <div style="width:200px; text-align:right; font-size:12px; color:#666;">
-                <div>Preview:</div>
-                <img id="logoPreview" src="" alt="logo preview"
-                    style="max-width:180px; max-height:60px; object-fit:contain; display:none; border-radius:4px; margin-top:6px" />
+            <div
+                style="width: 300px; height: 100px; border: 1px dashed #ccc; background:#f9f9f9; margin-top:6px; display:flex; align-items:center; justify-content:center;">
+                <img id="logoPreview" src="" alt="logo preview" />
             </div>
         </div>
 
@@ -403,12 +405,35 @@
             }
 
             // logo preview
-            logoFileInput.addEventListener('change', () => {
+            // preview + consistent scaling to match PDF mm -> px
+            const LOGO_WIDTH_MM = 50;
+            const PX_PER_MM = 96 / 25.4; // CSS px per mm ≈ 3.7795
+            logoFileInput.addEventListener('change', async () => {
                 const f = logoFileInput.files && logoFileInput.files[0];
-                if (!f) { logoPreview.style.display = 'none'; logoPreview.src = ''; return; }
+                if (!f) {
+                    logoPreview.style.display = 'none';
+                    logoPreview.src = '';
+                    return;
+                }
+
                 const url = URL.createObjectURL(f);
-                logoPreview.src = url;
-                logoPreview.style.display = 'block';
+                const img = new Image();
+                img.onload = () => {
+                    const pdfLogoWidthMM = 50; // PDF width in mm
+                    const pdfScale = 2;        // approx pixels per mm
+                    const previewWidth = pdfLogoWidthMM * pdfScale;
+                    const previewHeight = (img.height * previewWidth) / img.width;
+
+                    logoPreview.style.width = `${previewWidth}px`;
+                    logoPreview.style.height = `${previewHeight}px`;
+                    logoPreview.src = img.src;
+                    logoPreview.style.display = 'block';
+                };
+                img.onerror = (e) => {
+                    console.warn('Preview image load failed', e);
+                    logoPreview.style.display = 'none';
+                };
+                img.src = url;
             });
 
             $('addRowBtn').addEventListener('click', () => { addRow(); setStatus('row added'); });
@@ -480,152 +505,164 @@
             <td style="padding:8px; text-align:right"> ${formatCurrency(total)}</td>
           </tr>`;
                     });
-                    // ===== NEW: professional header + logo + client info (drop this in place of old header block) =====
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF();
                     doc.setFont("times", "normal");
+                    // Fixed logo position and size
+                    // ===== draw logo into PDF, matching preview scaling =====
+                    const MAX_LOGO_W_MM = 50; // maximum logo width in mm
+                    const MAX_LOGO_H_MM = 20; // maximum logo height in mm
+                    const LOGO_X_MM = 150;    // x position in mm (right side)
+                    const LOGO_Y_MM = 15;     // y position in mm (top)
+                    const GAP_AFTER_LOGO_MM = 6; // gap under logo before heading starts
 
-                    // starting vertical cursor (mm)
-                    let y = 20;
+                    let yStartAfterLogo = 45; // default fallback if logo not present or fails
 
-                    try {
-                        // draw logo top-right (if uploaded)
-                        if (logoDataUrl) {
-                            try {
-                                const imgProps = doc.getImageProperties(logoDataUrl);
-                                // maximum logo width in mm (adjust as you like)
-                                const maxLogoWidth = 50;
-                                // preserve aspect ratio (imgProps.width / imgProps.height)
-                                const ratio = imgProps.width / imgProps.height || 1;
-                                const logoWidth = maxLogoWidth;
-                                const logoHeight = Math.round(logoWidth / ratio);
+                    if (logoDataUrl) {
+                        try {
+                            // load image into <img> to read natural size and handle SVG->PNG if needed
+                            const img = new Image();
+                            await new Promise((res, rej) => {
+                                img.onload = res;
+                                img.onerror = rej;
+                                img.src = logoDataUrl;
+                            });
 
-                                // compute x such that the logo is flush-right with 20mm page margin
-                                const pageW = doc.internal.pageSize.getWidth();
-                                const logoX = pageW - logoWidth - 20; // 20mm right margin
-
-                                // detect image type from dataURL
-                                const imgType = logoDataUrl.startsWith("data:image/png") ? "PNG" : "JPEG";
-
-                                // addImage
-                                doc.addImage(logoDataUrl, imgType, logoX, y, logoWidth, logoHeight);
-
-                                // if the logo is taller than default header height, push down y accordingly
-                                // choose a small safety gap so text won't touch the logo
-                                const headerMinHeight = 18; // mm baseline for header
-                                const usedHeaderHeight = Math.max(headerMinHeight, logoHeight);
-                                y += usedHeaderHeight + 4; // leave a small 4mm gap under header
-                            } catch (imgErr) {
-                                console.warn("Logo draw failed:", imgErr);
-                                showDebug && showDebug("Logo draw failed — continuing without logo:\n" + (imgErr.stack || imgErr));
-                                // don't change y here (logo not drawn)
-                                y += 12; // ensure some top spacing
+                            // if the source is an SVG (data: or file), convert it to PNG on a canvas for jsPDF
+                            let dataForPdf = logoDataUrl;
+                            if (img.src.startsWith('data:image/svg+xml') || /\.svg$/i.test(img.src)) {
+                                const canvas = document.createElement('canvas');
+                                // use natural size or constrain to something reasonable to keep quality
+                                canvas.width = img.naturalWidth || 800;
+                                canvas.height = img.naturalHeight || 200;
+                                const ctx = canvas.getContext('2d');
+                                // white background (optional)
+                                ctx.fillStyle = '#ffffff';
+                                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                                dataForPdf = canvas.toDataURL('image/png');
                             }
-                        } else {
-                            // no logo: leave default spacing
-                            y += 12;
+
+                            // natural pixel dimensions
+                            const natW = img.naturalWidth || img.width;
+                            const natH = img.naturalHeight || img.height;
+
+                            // 1) target width = MAX_LOGO_W_MM, compute height to keep aspect ratio
+                            let logoWmm = MAX_LOGO_W_MM;
+                            let logoHmm = (natH * logoWmm) / natW;
+
+                            // 2) if height exceeds max, scale down to fit max height
+                            if (logoHmm > MAX_LOGO_H_MM) {
+                                const s = MAX_LOGO_H_MM / logoHmm;
+                                logoWmm = logoWmm * s;
+                                logoHmm = logoHmm * s;
+                            }
+
+                            // 3) Prevent upscaling above the image's "native size in mm"
+                            // approximate native mm size from pixels using 96 DPI (CSS) => px -> mm: px * 25.4 / 96
+                            const PX_TO_MM = 25.4 / 96;
+                            const nativeWmm = natW * PX_TO_MM;
+                            if (logoWmm > nativeWmm) {
+                                const s2 = nativeWmm / logoWmm;
+                                logoWmm = logoWmm * s2;
+                                logoHmm = logoHmm * s2;
+                            }
+
+                            // detect image type for jsPDF addImage
+                            let imgType = 'PNG';
+                            if (dataForPdf.startsWith('data:image/jpeg') || dataForPdf.startsWith('data:image/jpg')) imgType = 'JPEG';
+                            else if (dataForPdf.startsWith('data:image/png')) imgType = 'PNG';
+
+                            // finally, draw the image into the PDF
+                            doc.addImage(dataForPdf, imgType, LOGO_X_MM, LOGO_Y_MM, logoWmm, logoHmm);
+
+                            // compute a safe start y for the rest of the header (logo bottom + gap)
+                            yStartAfterLogo = Math.max(45, LOGO_Y_MM + logoHmm + GAP_AFTER_LOGO_MM);
+                        } catch (e) {
+                            console.warn('PDF logo draw failed — skipping logo', e);
+                            showDebug && showDebug('PDF logo draw failed — continuing without logo:\n' + (e.stack || e));
+                            // keep default yStartAfterLogo
                         }
-                    } catch (outer) {
-                        console.warn("Logo handling error:", outer);
-                        y = 32;
                     }
 
-                    // === Company name (left) ===
-                    doc.setFont("times", "bold");
-                    doc.setFontSize(20);
-                    doc.setTextColor(44, 62, 80);
-                    doc.text(company, 20, y - 2); // slightly up inside header space
+                    // now use the computed yStartAfterLogo as the top for your header/body
+                    let y = yStartAfterLogo;
 
+                    // Company Name
+                    doc.setFont("times", "bold");
+                    doc.setFontSize(22);
+                    doc.text(company, 20, y);
+
+                    // Company contact info
                     doc.setFont("times", "italic");
                     doc.setFontSize(10);
-                    doc.setTextColor(44, 62, 80);
-                    if (companyPhone) doc.text(`Phone: ${companyPhone}`, 20, y + 6);
-                    if (companyEmail) doc.text(`Email: ${companyEmail}`, 20, y + 12);
+                    doc.text(`Phone: ${companyPhone}`, 20, y + 8);
+                    doc.text(`Email: ${companyEmail}`, 20, y + 14);
 
-                    // === Quote meta box (right) ===
-                    const metaW = 60;
-                    const metaH = 28;
-                    const pageWidth = doc.internal.pageSize.getWidth();
-                    const metaX = pageWidth - metaW - 20; // 20 mm right margin
-                    const metaY = y - 14; // position it to align with header area
-
-                    doc.setFillColor(237, 241, 245);
+                    // Quote info box (right side)
                     doc.setDrawColor(200);
-                    doc.rect(metaX, metaY, metaW, metaH, "F");
+                    doc.setFillColor(245, 245, 245);
+                    doc.rect(140, y - 6, 50, 24, "F");
 
-                    doc.setFont("times", "bold");
+                    doc.setFont(undefined, "bold");
                     doc.setFontSize(10);
-                    doc.setTextColor(20, 20, 20);
-                    doc.text("QUOTE", metaX + 6, metaY + 8);
+                    doc.text("QUOTE", 145, y);
 
-                    doc.setFont("times", "normal");
-                    doc.setFontSize(9);
-                    doc.text(`Date: ${dateStr}`, metaX + 6, metaY + 15);
-                    doc.text(`No: ${quoteNo}`, metaX + 6, metaY + 22);
-
-                    // advance y below header / meta - ensure there is space
-                    y = Math.max(y + 8, metaY + metaH + 6);
-
-                    // === Client info box (stacked, wraps address) ===
-                    const clientBoxX = 20;
-                    const clientBoxW = pageWidth - clientBoxX * 2;
-                    const clientBoxY = y;
-                    doc.setFillColor(251, 253, 255);
-                    doc.setDrawColor(236, 245, 252);
-                    doc.rect(clientBoxX, clientBoxY, clientBoxW, 38, "F");
-
-                    // labels & values - labels muted, values bold
-                    const labelX = clientBoxX + 6;
-                    const valueX = clientBoxX + 72;
-                    let lineY = clientBoxY + 10;
-
-                    doc.setFont("times", "bold");
-                    doc.setFontSize(12);
-                    doc.setTextColor(20, 20, 20);
-                    doc.text("Client Information", labelX, lineY);
-
-                    // move to first value row
-                    lineY += 8;
                     doc.setFont("times", "italic");
+                    doc.text(`Date: ${dateStr}`, 145, y + 8);
+                    doc.text(`No: ${quoteNo}`, 145, y + 14);
+
+                    // 5️⃣ quote info box
+                    doc.setDrawColor(200);
+                    doc.setFillColor(245, 245, 245);
+                    doc.rect(140, y - 6, 50, 24, "F");
+
                     doc.setFontSize(10);
-                    doc.setTextColor(120);
-                    doc.text("Client Name:", labelX, lineY);
-                    doc.setFont("times", "bold");
-                    doc.setTextColor(20, 20, 20);
-                    doc.text(clientNameVal || "____________________", valueX, lineY);
+                    doc.setFont(undefined, "bold");
+                    doc.text("QUOTE", 145, y);
 
-                    // Contact row
-                    lineY += 7;
                     doc.setFont("times", "italic");
-                    doc.setTextColor(120);
-                    doc.text("Contact:", labelX, lineY);
+                    doc.text(`Date: ${dateStr}`, 145, y + 8);
+                    doc.text(`No: ${quoteNo}`, 145, y + 14);
+
+                    // 6️⃣ move y below header for next section
+                    y += 28;
+
+                    // Client info box
+                    doc.setFillColor(250, 252, 255);
+                    doc.rect(20, y, 170, 40, "F");
+
                     doc.setFont("times", "bold");
-                    doc.setTextColor(20, 20, 20);
-                    doc.text(clientContactVal || "____________________", valueX, lineY);
+                    doc.setFontSize(13);
+                    doc.text("Client Information", 25, y + 8);
 
-                    // Address row (wraps)
-                    lineY += 8;
+                    doc.setFontSize(10);
+
+                    // Client Name
                     doc.setFont("times", "italic");
-                    doc.setTextColor(120);
-                    doc.text("Address:", labelX, lineY);
-                    doc.setFont("times", "bold");
-                    doc.setTextColor(20, 20, 20);
-                    const addressText = clientAddressVal || "____________________";
-                    const addressLines = doc.splitTextToSize(addressText, clientBoxW - (valueX - clientBoxX) - 8); // width for value column
-                    doc.text(addressLines, valueX, lineY);
+                    doc.text("Client Name:", 25, y + 16);
 
-                    // move y below client box (increase by actual address lines)
-                    y = clientBoxY + 38 + (addressLines.length - 1) * 6 + 6;
+                    doc.setFont(undefined, "bold");
+                    doc.text(clientNameVal || "-", 70, y + 16);
 
-                    // small validity line
+                    // Contact
                     doc.setFont("times", "italic");
-                    doc.setFontSize(9);
-                    doc.setTextColor(80);
-                    doc.text("This quotation is valid for 14 days.", clientBoxX, y);
-                    y += 8;
+                    doc.text("Contact:", 25, y + 22);
 
-                    // now y is safe to pass to autoTable's startY
-                    // ===== END header / client block =====
+                    doc.setFont(undefined, "bold");
+                    doc.text(clientContactVal || "-", 70, y + 22);
+
+                    // Address (auto wrapped)
+                    doc.setFont("times", "italic");
+                    doc.text("Address:", 25, y + 28);
+
+                    doc.setFont(undefined, "bold");
+
+                    const addressLines = doc.splitTextToSize(clientAddressVal || "-", 110);
+                    doc.text(addressLines, 70, y + 28);
+
+                    y += 40 + (addressLines.length - 1) * 6;
+
                     doc.setFontSize(14);
                     doc.text("Quotation", 20, y);
                     y += 6;
