@@ -3,91 +3,181 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Quotation Builder By Moyozen</title>
+    <title>Quotation Builder By Moyozen — PDF</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <style>
+        :root {
+            --bg: #f4f6f8;
+            --card-bg: #fff;
+            --accent: #2c3e50;
+            --muted: #666;
+            --radius: 10px;
+            --gap: 12px;
+            --ui-padding: 16px;
+            --max-width: 920px;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
         body {
             font-family: Inter, Arial, sans-serif;
-            background: #f4f6f8;
-            padding: 28px
+            background: var(--bg);
+            padding: 18px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            color: #222;
+            box-sizing: border-box;
         }
 
         .card {
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 920px;
-            margin: 16px auto;
-            box-shadow: 0 14px 30px rgba(20, 25, 30, 0.06)
+            background: var(--card-bg);
+            padding: var(--ui-padding);
+            border-radius: var(--radius);
+            max-width: var(--max-width);
+            width: 100%;
+            margin: 12px auto;
+            box-shadow: 0 14px 30px rgba(20, 25, 30, 0.06);
+            box-sizing: border-box;
         }
 
         h1 {
-            margin: 0;
-            font-size: 20px
+            margin: 0 0 6px 0;
+            font-size: 18px;
+            color: var(--accent);
+        }
+
+        p.muted {
+            margin: 0 0 10px 0;
+            color: var(--muted);
+            font-size: 13px;
         }
 
         .row {
             display: flex;
+            gap: var(--gap);
             flex-wrap: wrap;
-            /* allow items to stack on small screens */
-            gap: 12px;
-            margin-top: 12px;
+            align-items: flex-start;
         }
 
         .col {
             flex: 1 1 200px;
-            /* grow, shrink, min-width 200px */
-            min-width: 150px;
+            min-width: 140px;
         }
 
         input[type="text"],
         input[type="number"],
-        input[type="file"] {
+        input[type="file"],
+        select {
             width: 100%;
             box-sizing: border-box;
-            padding: 8px;
-            border-radius: 6px;
+            padding: 10px;
+            border-radius: 8px;
             border: 1px solid #e6e9ee;
+            font-size: 14px;
+            background: #fff;
         }
 
-        button {
-            flex: 1 1 100px;
-            min-width: 100px;
-            margin-top: 6px;
+        label.small {
+            display: block;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 6px;
         }
 
-        table {
+        .preview-box {
             width: 100%;
-            border-collapse: collapse;
+            max-width: 320px;
+            /* visible on mobile but scales on desktop */
+            height: 110px;
+            border: 1px dashed #d7dbe0;
+            background: #fafafa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            overflow: hidden;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        #logoPreview {
+            display: none;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 6px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+            background: white;
+        }
+
+        table#items {
+            width: 100%;
             margin-top: 12px;
+            border-collapse: collapse;
             display: block;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #efefef;
+            padding: 2px;
         }
 
-        th,
-        td {
+        table#items thead th {
+            background: var(--accent);
+            color: white;
+            padding: 10px 12px;
+            text-align: left;
+            font-size: 13px;
+            min-width: 90px;
+        }
+
+        table#items td {
+            padding: 10px 12px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f4f4f4;
+            font-size: 14px;
             white-space: nowrap;
-            /* prevent wrapping of table cells */
         }
 
-        button {
-            background: #2c3e50;
+        table#items input {
+            margin: 0;
+            font-size: 14px;
+            padding: 8px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .controls button {
+            background: var(--accent);
             color: white;
             border: none;
-            padding: 10px 14px;
-            border-radius: 8px;
-            cursor: pointer
+            padding: 12px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            min-width: 120px;
         }
 
-        .muted {
-            color: #666;
-            font-size: 13px
+        .controls button.secondary {
+            background: #f4f6f8;
+            color: var(--accent);
+            border: 1px solid #e6e9ee;
         }
 
         .status {
             margin-top: 12px;
             font-size: 13px;
-            color: #333
+            color: var(--muted);
         }
 
         .debug {
@@ -97,98 +187,119 @@
             background: #fafafa;
             padding: 8px;
             border-radius: 6px;
-            border: 1px solid #eee
-        }
-
-        label.small {
-            display: block;
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 6px;
-        }
-
-        select {
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid #e6e9ee;
-            width: 100%;
-            background: white;
-        }
-
-        #logoPreview {
-            max-width: 100%;
-            max-height: 60px;
-            object-fit: contain;
+            border: 1px solid #eee;
             display: none;
-            border-radius: 4px;
-            margin-top: 6px;
         }
 
-        @media (max-width: 480px) {
+        /* mobile-first behaviour */
+        @media (max-width:640px) {
+            body {
+                padding: 12px;
+            }
+
+            .card {
+                padding: 14px;
+                margin: 8px;
+            }
+
+            .controls button {
+                width: 100%;
+                min-width: 0;
+            }
+
+            table#items td,
+            table#items thead th {
+                white-space: normal;
+                font-size: 14px;
+            }
+
+            .preview-box {
+                max-width: 100%;
+                height: 90px;
+            }
+
+            input[type="text"],
+            select {
+                padding: 12px;
+                font-size: 15px;
+            }
+
             .row {
-                flex-direction: column;
+                gap: 10px;
             }
 
             .col {
                 min-width: 100%;
             }
+        }
 
-            button {
-                width: 100%;
-                margin-top: 8px;
+        /* slightly larger screen polish */
+        @media (min-width:641px) and (max-width:1024px) {
+            .controls button {
+                flex: 1;
             }
 
-            #items {
-                font-size: 14px;
-                /* slightly smaller table text */
+            table#items td {
+                font-size: 13px;
             }
+
+            .preview-box {
+                max-width: 280px;
+            }
+        }
+
+        /* focus accessibility */
+        input:focus,
+        select:focus,
+        button:focus {
+            outline: 3px solid rgba(44, 62, 80, 0.12);
+            outline-offset: 2px;
         }
     </style>
 </head>
 
 <body>
-    <div class="card">
+    <div class="card" role="main">
         <h1>Build your Quotation</h1>
-        <p class="muted">fill in this beautiful form to create your quotation in a few seconds</p>
+        <p class="muted">Fill in the form and tap <strong>Generate Quote</strong> to create PDF.</p>
 
-        <div class="row">
-            <div class="col"><input id="company" type="text" placeholder="Company name" />
+        <div class="row" style="margin-bottom:8px">
+            <div class="col"><input id="company" type="text" placeholder="Company name" value="Moyo Zen Construction" />
             </div>
             <div style="width:220px"><input id="date" type="text" placeholder="Date (optional - auto generated)" />
             </div>
             <div style="width:220px"><input id="quoteNo" type="text" placeholder="Quote No (optional)" /></div>
         </div>
 
-        <div class="row" style="margin-top:8px">
+        <div class="row" style="margin-top:6px">
             <div class="col">
                 <label class="small">Company Phone</label>
-                <input id="companyPhone" type="text" placeholder="e.g. 079 684 8598" />
+                <input id="companyPhone" type="text" placeholder="e.g. 079 684 8598" value="079 684 8598" />
             </div>
             <div class="col">
                 <label class="small">Company Email</label>
-                <input id="companyEmail" type="text" placeholder="e.g. info@moyozen.co.za" />
+                <input id="companyEmail" type="text" placeholder="e.g. info@moyozen.co.za" value="info@moyozen.co.za" />
             </div>
         </div>
 
-        <div style="margin-top:12px; display:flex; gap:12px; align-items:center;">
-            <div style="flex:1">
-                <label class="small">Company Logo (optional) - i.e your image size will affect your output</label>
+        <div style="display:flex; gap:12px; align-items:center; margin-top:12px; flex-wrap:wrap;">
+            <div style="flex:1; min-width:180px;">
+                <label class="small">Company Logo (optional)</label>
                 <input id="logoFile" type="file" accept="image/*" />
             </div>
-            <div style="width:200px; text-align:right; font-size:12px; color:#666;">
-                <div>Preview:</div>
-                <img id="logoPreview" src="" alt="logo preview"
-                    style="max-width:180px; max-height:60px; object-fit:contain; display:none; border-radius:4px; margin-top:6px" />
+
+            <div class="preview-box" aria-hidden="false" title="Logo preview">
+                <img id="logoPreview" src="" alt="logo preview" />
             </div>
         </div>
 
         <div style="margin-top:14px; border-radius:8px; padding:10px; background:#fbfdff; border:1px solid #eef6fb">
-            <div style="display:flex; gap:12px;">
-                <div style="flex:1">
+            <div class="row">
+                <div class="col">
                     <label class="small">Client Name</label>
                     <input id="clientName" type="text" placeholder="Client full name or company" />
                 </div>
-                <div style="flex:1">
+                <div class="col">
                     <label class="small">Client Phone / Email</label>
                     <input id="clientContact" type="text" placeholder="Phone or email" />
                 </div>
@@ -199,374 +310,366 @@
             </div>
         </div>
 
-        <table id="items" aria-label="items">
-            <tr>
-                <th style="width:46%">Description</th>
-                <th style="width:12%">Quantity</th>
-                <th style="width:12%">Measure</th>
-                <th style="width:12%">Price</th>
-            </tr>
+        <table id="items" aria-label="items" role="table">
+            <thead>
+                <tr>
+                    <th style="width:46%">Description</th>
+                    <th style="width:12%">Quantity</th>
+                    <th style="width:12%">Measure</th>
+                    <th style="width:12%">Price</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
         </table>
 
-        <div style="display:flex; gap:10px; margin-top:14px">
+        <div class="controls" style="margin-top:14px">
             <button id="addRowBtn">Add Item</button>
-            <button id="autoTestBtn">Auto Test</button>
+            <button id="autoTestBtn" class="secondary">Auto Test</button>
             <button id="generateBtn">Generate Quote</button>
         </div>
 
-        <div id="status" class="status">Status: initializing…</div>
-        <div id="debug" class="debug" style="display:none"></div>
+        <div id="status" class="status">Status: ready</div>
+        <div id="debug" class="debug" aria-hidden="true"></div>
     </div>
 
-    <!-- load UMD fast -->
-    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script>
         (async function main() {
             const statusEl = document.getElementById('status');
             const debugEl = document.getElementById('debug');
             const logoFileInput = document.getElementById('logoFile');
             const logoPreview = document.getElementById('logoPreview');
-            const setStatus = (t) => { statusEl.textContent = 'Status: ' + t; console.log('[STATUS]', t); };
-            const showDebug = (t) => { debugEl.style.display = 'block'; debugEl.textContent = t; console.log('[DEBUG]', t); };
+            const tbody = document.querySelector('#items tbody');
+            const setStatus = t => { statusEl.textContent = 'Status: ' + t; console.log('[STATUS]', t); };
+            const showDebug = t => { debugEl.style.display = 'block'; debugEl.textContent = t; console.log('[DEBUG]', t); };
 
-            setStatus('checking docx...');
-            let docxLib = window.docx;
-            if (!docxLib) {
-                try {
-                    const mod = await import('https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js');
-                    docxLib = mod;
-                    setStatus('docx loaded (ESM).');
-                } catch (e) {
-                    setStatus('failed to dynamically import docx; trying unpkg UMD');
-                    try {
-                        await new Promise((resolve, reject) => {
-                            const s = document.createElement('script');
-                            s.src = 'https://unpkg.com/docx@8.5.0/build/index.umd.js';
-                            s.onload = resolve;
-                            s.onerror = () => reject(new Error('unpkg load failed'));
-                            document.head.appendChild(s);
-                        });
-                        docxLib = window.docx || null;
-                        if (docxLib) setStatus('docx loaded (unpkg).');
-                    } catch (e2) {
-                        showDebug('Could not load docx library. Serve via http if using file://.\n' + (e.stack || e) + '\n' + (e2 && (e2.stack || e2)));
-                        setStatus('docx not available');
-                        return;
-                    }
-                }
-            } else {
-                setStatus('docx found (UMD).');
-            }
-
-            // Pull APIs (ImageRun may exist)
-            const {
-                Document = docxLib.Document,
-                Packer = docxLib.Packer,
-                Paragraph = docxLib.Paragraph,
-                Table = docxLib.Table,
-                TableRow = docxLib.TableRow,
-                TableCell = docxLib.TableCell,
-                TextRun = docxLib.TextRun,
-                WidthType = docxLib.WidthType,
-                AlignmentType = docxLib.AlignmentType,
-                ImageRun = docxLib.ImageRun // <- ImageRun if available
-            } = docxLib;
-
-            if (!Document || !Packer || !Paragraph) {
-                showDebug('docx exports missing — cannot continue.');
-                setStatus('docx missing required exports');
-                return;
-            }
-
-            setStatus('docx ready — UI active');
-
-            // helpers
             const $ = id => document.getElementById(id);
             const formatCurrency = v => `R${Number(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
             function addRow() {
-                const table = $('items');
-                const row = table.insertRow();
-
+                const row = document.createElement('tr');
                 row.innerHTML = `
-        <td><input placeholder="Description" type="text"></td>
-        <td><input placeholder="Quantity" type="number" step="any"></td>
-        <td>
+          <td><input placeholder="Description" type="text"></td>
+          <td><input placeholder="Quantity" type="number" step="any"></td>
+          <td>
             <select class="measure">
-                <option value="">--</option>
-                <option value="m²">m²</option>
-                <option value="m">m</option>
-                <option value="each">each</option>
-                <option value="set">set</option>
-                <option value="lot">lot</option>
-                <option value="hr">hr</option>
-                <option value="day">day</option>
-                <option value="kg">kg</option>
+              <option value="">--</option>
+              <option value="m²">m²</option>
+              <option value="m">m</option>
+              <option value="each">each</option>
+              <option value="set">set</option>
+              <option value="lot">lot</option>
+              <option value="hr">hr</option>
+              <option value="day">day</option>
+              <option value="kg">kg</option>
             </select>
-        </td>
-        <td><input placeholder="Price (per unit)" type="number" step="any"></td>
-    `;
-
+          </td>
+          <td><input placeholder="Price (per unit)" type="number" step="any"></td>
+        `;
+                tbody.appendChild(row);
                 return row;
             }
 
-            function formatUnit(qty, unit) {
-                if (!unit) return qty.toString();
-
-                // normalize unit string
+            function formatQuantity(qty, unit) {
+                if (!unit) return `${qty}`;
                 unit = unit.toLowerCase();
-
-                // units that don’t get pluralized
-                const countUnits = ["each"];
-
-                if (countUnits.includes(unit)) {
-                    return `${qty}`; // always show "230 each", "1 lot"
-                }
-
-                // units that do get pluralized
-                const plurals = {
-                    "day": "days",
-                    "hr": "hrs",
-                    "hour": "hrs",
-                    "set": "sets",
-                    "lot": "lots",
-                    "m²": "m²",   // area, no plural change
-                    "sheet": "sheets"
-                };
-
-                let displayUnit = unit;
-                if (qty !== 1 && plurals[unit]) displayUnit = plurals[unit];
-
-                return `${qty} ${displayUnit}`;
+                const attachToQty = ["m²", "m", "kg", "hr", "day"];
+                const plurals = { "day": "days", "hr": "hrs", "hour": "hrs", "lot": "lots", "set": "sets" };
+                const displayUnit = (qty !== 1 && plurals[unit]) ? plurals[unit] : unit;
+                if (attachToQty.includes(unit)) return `${qty} ${displayUnit}`;
+                return `${qty}`;
             }
 
-            // logo preview
-            logoFileInput.addEventListener('change', () => {
+            function formatPrice(price, unit) {
+                if (!unit) return `R${price.toFixed(2)}`;
+                unit = unit.toLowerCase();
+                const wordUnits = ["each", "set", "lot"];
+                if (wordUnits.includes(unit)) return `R${price.toFixed(2)} ${unit}`;
+                return `R${price.toFixed(2)}/${unit}`;
+            }
+
+            // --- Preview scaling — exact mm -> px conversion so preview matches PDF scaling
+            const LOGO_WIDTH_MM = 50;
+            const PX_PER_MM = 96 / 25.4; // CSS pixels per mm (~3.78)
+            logoFileInput.addEventListener('change', async () => {
                 const f = logoFileInput.files && logoFileInput.files[0];
-                if (!f) { logoPreview.style.display = 'none'; logoPreview.src = ''; return; }
+                if (!f) {
+                    logoPreview.style.display = 'none';
+                    logoPreview.src = '';
+                    return;
+                }
+
                 const url = URL.createObjectURL(f);
-                logoPreview.src = url;
-                logoPreview.style.display = 'block';
+                const img = new Image();
+                img.onload = () => {
+                    const previewWidthPx = Math.round(LOGO_WIDTH_MM * PX_PER_MM);
+                    const previewHeightPx = Math.round((img.naturalHeight * previewWidthPx) / img.naturalWidth);
+
+                    logoPreview.style.width = previewWidthPx + 'px';
+                    logoPreview.style.height = previewHeightPx + 'px';
+                    logoPreview.src = url;
+                    logoPreview.style.display = 'block';
+                };
+                img.onerror = (e) => {
+                    console.warn('Preview image load failed', e);
+                    logoPreview.style.display = 'none';
+                };
+                img.src = url;
             });
 
             $('addRowBtn').addEventListener('click', () => { addRow(); setStatus('row added'); });
             $('autoTestBtn').addEventListener('click', () => {
-                const table = $('items');
-                while (table.rows.length > 1) table.deleteRow(1);
-                const r1 = addRow(); const i1 = r1.querySelectorAll('input'); i1[0].value = 'Install Wall Panels'; i1[1].value = '5.76'; r1.querySelector("select").value = "m²"; i1[3].value = '290.50';
-                const r2 = addRow(); const i2 = r2.querySelectorAll('input'); i2[0].value = 'Install Marble/MDF Sheet'; i2[1].value = '1'; i2[3].value = '250.00';
+                tbody.innerHTML = '';
+                const r1 = addRow(); const i1 = r1.querySelectorAll('input'); i1[0].value = 'Install Wall Panels'; i1[1].value = '5.76'; r1.querySelector("select").value = "m²"; i1[2].value = 290.50;
+                const r2 = addRow(); const i2 = r2.querySelectorAll('input'); i2[0].value = 'Install Marble/MDF Sheet'; i2[1].value = '1'; r2.querySelector("select").value = "each"; i2[2].value = 250.00;
                 setStatus('sample rows added');
             });
 
-            // Replace your current generateBtn click handler with this function body
             $('generateBtn').addEventListener('click', async () => {
                 try {
-                    setStatus('reading inputs...');
-                    const company = $('company').value.trim() || 'Client';
+                    setStatus('building PDF template...');
+                    const company = $('company').value.trim() || 'Moyo Zen Construction';
                     const companyPhone = $('companyPhone').value.trim() || '';
                     const companyEmail = $('companyEmail').value.trim() || '';
                     const dateStr = $('date').value.trim() || (new Date()).toLocaleDateString();
                     const quoteNo = $('quoteNo').value.trim() || `Q-${(new Date()).toISOString().slice(0, 10).replace(/-/g, '')}`;
-
                     const clientNameVal = $('clientName').value.trim() || '';
                     const clientContactVal = $('clientContact').value.trim() || '';
                     const clientAddressVal = $('clientAddress').value.trim() || '';
 
-                    // read table rows
-                    const rows = document.querySelectorAll('#items tr');
+                    // read rows
+                    const rows = document.querySelectorAll('#items tbody tr');
                     const items = [];
-                    rows.forEach((row, i) => {
-                        if (i === 0) return;
+                    rows.forEach((row) => {
                         const inputs = row.querySelectorAll('input');
-                        const measure = row.querySelector('select');
+                        const select = row.querySelector('select');
                         const desc = (inputs[0].value || '').trim();
                         if (!desc) return;
                         const qty = parseFloat(inputs[1].value) || 0;
-                        const unit = (measure?.value || '').trim();
-                        const price = parseFloat(inputs[2].value) || 0;
+                        const unit = (select && select.value) ? select.value.trim() : '';
+                        const price = parseFloat(inputs[2].value) || 0; // after change: price at index 3
                         items.push({ desc, qty, unit, price });
                     });
 
-                    if (!items.length) { setStatus('no items — add rows or use Auto Test'); return; }
+                    if (!items.length) { setStatus('no items — add rows or auto test'); return; }
 
-                    // Build the table rows (same style you already had)
-                    const tableRows = [];
-                    tableRows.push(new TableRow({
-                        children: [
-                            new TableCell({ shading: { fill: "2C3E50" }, children: [new Paragraph({ children: [new TextRun({ text: "DESCRIPTION", bold: true, color: "FFFFFF", size: 24 })] })] }),
-                            new TableCell({ shading: { fill: "2C3E50" }, children: [new Paragraph({ children: [new TextRun({ text: "QTY", bold: true, color: "FFFFFF", size: 24 })], alignment: AlignmentType.CENTER })] }),
-                            new TableCell({ shading: { fill: "2C3E50" }, children: [new Paragraph({ children: [new TextRun({ text: "PRICE (EACH)", bold: true, color: "FFFFFF", size: 24 })] })] }),
-                            new TableCell({ shading: { fill: "2C3E50" }, children: [new Paragraph({ children: [new TextRun({ text: "TOTAL", bold: true, color: "FFFFFF", size: 24 })], alignment: AlignmentType.RIGHT })] })
-                        ]
-                    }));
+                    // embed logo dataURL if present
+                    let logoDataUrl = null;
+                    const file = logoFileInput.files && logoFileInput.files[0];
+                    if (file) {
+                        try {
+                            setStatus('embedding logo...');
+                            logoDataUrl = await new Promise((resolve, reject) => {
+                                const r = new FileReader();
+                                r.onload = e => resolve(e.target.result);
+                                r.onerror = reject;
+                                r.readAsDataURL(file);
+                            });
+                        } catch (e) {
+                            console.warn('logo read failed', e);
+                            showDebug('Logo read failed — continuing without logo:\n' + (e.stack || e));
+                        }
+                    }
 
-                    const dividerRow = new TableRow({ children: [new TableCell({ columnSpan: 4, shading: { fill: "DDE6F0" }, children: [new Paragraph(" ")] })] });
-
+                    // build tableRows
                     let grandTotal = 0;
-                    const itemRows = [];
-                    items.forEach((it, idx) => {
-
-
-                        let qtyDisplay = it.unit ? formatUnit(it.qty, it.unit) : `${it.qty}`;
-                        let priceDisplay = it.unit ? `R${it.price.toFixed(2)}/${it.unit}` : `R${it.price.toFixed(2)}`;
+                    const tableRows = [];
+                    items.forEach(it => {
                         const total = it.qty * it.price;
                         grandTotal += total;
-                        const shade = (idx % 2 === 1) ? { fill: "F7F7F7" } : undefined;
-
-                        itemRows.push(new TableRow({
-                            children: [
-                                new TableCell({ shading: shade, children: [new Paragraph({ children: [new TextRun({ text: it.desc, size: 22 })] })] }),
-                                new TableCell({ shading: shade, children: [new Paragraph({ children: [new TextRun({ text: qtyDisplay, size: 22 })], alignment: AlignmentType.CENTER })] }),
-                                new TableCell({ shading: shade, children: [new Paragraph({ children: [new TextRun({ text: priceDisplay, size: 22 })], alignment: AlignmentType.RIGHT })] }),
-                                new TableCell({ shading: shade, children: [new Paragraph({ children: [new TextRun({ text: `R${total.toFixed(2)}`, size: 22 })], alignment: AlignmentType.RIGHT })] })
-                            ]
-                        }));
+                        const qtyDisplay = formatQuantity(it.qty, it.unit);
+                        const priceDisplay = formatPrice(it.price, it.unit);
+                        tableRows.push([it.desc, qtyDisplay, priceDisplay, `R${total.toFixed(2)}`]);
                     });
 
-                    const totalRow = new TableRow({
-                        children: [
-                            new TableCell({ columnSpan: 3, shading: { fill: "E9E9E9" }, children: [new Paragraph({ children: [new TextRun({ text: "Grand Total", bold: true, size: 24 })], alignment: AlignmentType.RIGHT })] }),
-                            new TableCell({ shading: { fill: "E9E9E9" }, children: [new Paragraph({ children: [new TextRun({ text: `R${grandTotal.toFixed(2)}`, bold: true, size: 36 })], alignment: AlignmentType.RIGHT })] })
-                        ]
-                    });
+                    // create PDF
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    doc.setFont("times", "normal");
 
-                    tableRows.push(dividerRow);
-                    itemRows.forEach(r => tableRows.push(r));
-                    tableRows.push(totalRow);
+                    // ---------- logo drawing with max dims, proportionally scaled ----------
 
-                    // ===== Prepare optional logo using ImageRun (if present) =====
-                    let logoParagraph = null;
-                    try {
-                        const logoFile = logoFileInput.files && logoFileInput.files[0];
-                        if (logoFile && typeof ImageRun !== 'undefined') {
-                            setStatus('reading logo file...');
-                            const imageRun = await createImageRun(logoFile);
-                            logoParagraph = new Paragraph({
-                                children: [imageRun],
-                                alignment: AlignmentType.CENTER
-                            });
-                            setStatus('logo prepared successfully');
-                        } else if (logoFile) {
-                            showDebug('ImageRun not available — skipping logo.');
+                    const MAX_LOGO_W_MM = 50;   // maximum logo width
+                    const MAX_LOGO_H_MM = 20;   // maximum logo height
+                    const TOP_LOGO_Y_MM = 15;   // top Y for the logo
+                    const RIGHT_MARGIN_MM = 20; // right margin from page edge
+                    const GAP_AFTER_LOGO_MM = 6;
+
+                    let yStartAfterLogo = 45; // fallback if no logo or error
+
+                    if (logoDataUrl) {
+                        try {
+                            // load image to read natural size
+                            const img = new Image();
+                            await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = logoDataUrl; });
+
+                            // Convert SVG -> PNG if needed (jsPDF prefers raster here)
+                            let dataForPdf = logoDataUrl;
+                            if (img.src.startsWith('data:image/svg+xml') || /\.svg$/i.test(img.src)) {
+                                const canvas = document.createElement('canvas');
+                                canvas.width = img.naturalWidth || 1200;
+                                canvas.height = img.naturalHeight || 300;
+                                const ctx = canvas.getContext('2d');
+                                ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                                dataForPdf = canvas.toDataURL('image/png');
+                            }
+
+                            // natural pixel size
+                            const natW = img.naturalWidth || img.width;
+                            const natH = img.naturalHeight || img.height;
+                            if (!natW || !natH) throw new Error('Invalid image dimensions');
+
+                            // 1) compute proportional size to fit inside max box
+                            let logoWmm = MAX_LOGO_W_MM;
+                            let logoHmm = (natH * logoWmm) / natW;
+
+                            // if height too tall, scale down to height limit
+                            if (logoHmm > MAX_LOGO_H_MM) {
+                                const s = MAX_LOGO_H_MM / logoHmm;
+                                logoWmm *= s; logoHmm *= s;
+                            }
+
+                            // 2) prevent upscaling beyond approximate native physical size (keeps quality)
+                            // convert native px -> mm approximated by 96 DPI: px * 25.4 / 96
+                            const PX_TO_MM = 25.4 / 96;
+                            const nativeWmm = natW * PX_TO_MM;
+                            if (logoWmm > nativeWmm) {
+                                const s2 = nativeWmm / logoWmm;
+                                logoWmm *= s2; logoHmm *= s2;
+                            }
+
+                            // figure out page width and compute x so image is flush-right with RIGHT_MARGIN_MM
+                            const pageWidth = doc.internal.pageSize.getWidth(); // in mm
+                            const logoXmm = pageWidth - RIGHT_MARGIN_MM - logoWmm;
+                            const logoYmm = TOP_LOGO_Y_MM;
+
+                            // detect mime for addImage (dataForPdf is a dataURL)
+                            let imgType = 'PNG';
+                            if (dataForPdf.startsWith('data:image/jpeg') || dataForPdf.startsWith('data:image/jpg')) imgType = 'JPEG';
+                            else if (dataForPdf.startsWith('data:image/png')) imgType = 'PNG';
+
+                            // draw image
+                            doc.addImage(dataForPdf, imgType, logoXmm, logoYmm, logoWmm, logoHmm);
+
+                            // compute safe y start below logo
+                            yStartAfterLogo = Math.max(45, logoYmm + logoHmm + GAP_AFTER_LOGO_MM);
+                        } catch (e) {
+                            console.warn('PDF logo draw failed — continuing without logo', e);
+                            // keep default yStartAfterLogo
                         }
-                    } catch (eLogo) {
-                        console.warn('logo embed failed', eLogo);
-                        showDebug('Logo embed failed — continuing without logo:\n' + (eLogo.stack || eLogo));
                     }
 
-                    // ===== Build the full children array FIRST (logo, headers, client info, title, table, footer) =====
-                    const children = [];
+                    // after the block, set y from computed value
+                    let y = yStartAfterLogo;
 
-                    if (logoParagraph) {
-                        children.push(logoParagraph);
-                        children.push(new Paragraph({ text: " ", spacing: { after: 120 } })); // spacer
-                    }
+                    // Header / company block
+                    doc.setFont("times", "bold"); doc.setFontSize(22); doc.setTextColor(44, 62, 80);
+                    doc.text(company, 20, y);
+                    doc.setFont("times", "italic"); doc.setFontSize(10);
+                    if (companyPhone) doc.text(`Phone: ${companyPhone}`, 20, y + 8);
+                    if (companyEmail) doc.text(`Email: ${companyEmail}`, 20, y + 14);
 
-                    children.push(new Paragraph({ children: [new TextRun({ text: company, bold: true, size: 44, color: "2C3E50" })], spacing: { after: 100 } }));
-                    if (companyPhone || companyEmail) {
-                        children.push(new Paragraph({ children: [new TextRun({ text: `Phone: ${companyPhone}    |    Email: ${companyEmail}`, italics: true, size: 20, color: "2C3E50" })], spacing: { after: 200 } }));
-                    } else {
-                        children.push(new Paragraph({ text: " ", spacing: { after: 200 } }));
-                    }
+                    // Quote meta box
+                    const metaW = 60, metaH = 28;
+                    const pageWidth = doc.internal.pageSize.getWidth();
+                    const metaX = pageWidth - metaW - 20;
+                    const metaY = y - 14;
+                    doc.setFillColor(237, 241, 245); doc.setDrawColor(200);
+                    doc.rect(metaX, metaY, metaW, metaH, "F");
+                    doc.setFont("times", "bold"); doc.setFontSize(10); doc.setTextColor(20, 20, 20);
+                    doc.text("QUOTE", metaX + 6, metaY + 8);
+                    doc.setFont("times", "normal"); doc.setFontSize(9);
+                    doc.text(`Date: ${dateStr}`, metaX + 6, metaY + 15);
+                    doc.text(`No: ${quoteNo}`, metaX + 6, metaY + 22);
 
-                    // Client info
-                    children.push(new Paragraph({ children: [new TextRun({ text: "Client Information", bold: true, size: 28 })], spacing: { before: 120, after: 80 } }));
-                    children.push(new Paragraph({ children: [new TextRun({ text: `Client Name: ${clientNameVal || "____________________"}`, size: 22 })], spacing: { after: 80 } }));
-                    children.push(new Paragraph({ children: [new TextRun({ text: `Address: ${clientAddressVal || "____________________"}`, size: 22 })], spacing: { after: 80 } }));
-                    children.push(new Paragraph({ children: [new TextRun({ text: `Phone / Email: ${clientContactVal || "____________________"}`, size: 22 })], spacing: { after: 100 } }));
-                    children.push(new Paragraph({ children: [new TextRun({ text: "This quotation is valid for 14 days.", italics: true, size: 20 })], spacing: { after: 200 } }));
+                    // client box
+                    y = Math.max(y + 8, metaY + metaH + 6);
+                    const clientBoxX = 20, clientBoxW = pageWidth - clientBoxX * 2, clientBoxY = y;
+                    doc.setFillColor(251, 253, 255); doc.setDrawColor(236, 245, 252);
+                    doc.rect(clientBoxX, clientBoxY, clientBoxW, 38, "F");
 
-                    // Quotation meta + title
-                    children.push(new Paragraph({ children: [new TextRun({ text: `Date: ${dateStr}    Quote No: ${quoteNo}`, italics: true, size: 20 })], spacing: { after: 120 } }));
-                    children.push(new Paragraph({ children: [new TextRun({ text: "QUOTATION", bold: true, size: 32 })], spacing: { after: 160 } }));
+                    doc.setFont("times", "bold"); doc.setFontSize(12); doc.setTextColor(20, 20, 20);
+                    doc.text("Client Information", clientBoxX + 6, clientBoxY + 10);
 
-                    // Table
-                    children.push(new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: tableRows }));
+                    let lineY = clientBoxY + 18;
+                    doc.setFont("times", "italic"); doc.setFontSize(10); doc.setTextColor(120);
+                    doc.text("Client Name:", clientBoxX + 6, lineY);
+                    doc.setFont("times", "bold"); doc.setTextColor(20, 20, 20);
+                    doc.text(clientNameVal || "____________________", clientBoxX + 72, lineY);
 
-                    // Footer / acceptance
-                    children.push(new Paragraph({ text: " ", spacing: { before: 200 } }));
-                    children.push(new Paragraph({ children: [new TextRun({ text: "Payment terms: 30 days from invoice date.", size: 18, color: "444444" })], spacing: { before: 120 } }));
-                    children.push(new Paragraph({ children: [new TextRun({ text: "Acceptance", bold: true, size: 28 })], spacing: { before: 200, after: 100 } }));
-                    children.push(new Paragraph({ children: [new TextRun({ text: "I hereby accept this quotation and agree to the terms stated above.", size: 22 })], spacing: { after: 120 } }));
-                    children.push(new Paragraph({ children: [new TextRun({ text: "Name: ______________________", size: 22 })], spacing: { after: 80 } }));
-                    children.push(new Paragraph({ children: [new TextRun({ text: "Signature: ______________________", size: 22 })], spacing: { after: 80 } }));
-                    children.push(new Paragraph({ children: [new TextRun({ text: "Date: ______________________", size: 22 })] }));
-                    children.push(
-                        new Paragraph({
-                            children: [
-                                new TextRun({
-                                    text: "—Generated with MoyoZen Quote Builder—",
-                                    italics: true,
-                                    size: 18,
-                                    color: "888888"
-                                })
-                            ],
-                            alignment: AlignmentType.CENTER,
-                            spacing: { before: 300 }
-                        })
-                    );
-                    // ===== CREATE DOCUMENT WITH sections: [{ children }] (fixes the 'sections not iterable' crash) =====
-                    const doc = new Document({
-                        creator: company || 'Quote Generator',
-                        sections: [{ children }]
+                    lineY += 7;
+                    doc.setFont("times", "italic"); doc.setTextColor(120);
+                    doc.text("Contact:", clientBoxX + 6, lineY);
+                    doc.setFont("times", "bold"); doc.setTextColor(20, 20, 20);
+                    doc.text(clientContactVal || "____________________", clientBoxX + 72, lineY);
+
+                    lineY += 8;
+                    doc.setFont("times", "italic"); doc.setTextColor(120);
+                    doc.text("Address:", clientBoxX + 6, lineY);
+                    doc.setFont("times", "bold"); doc.setTextColor(20, 20, 20);
+                    const addressLines = doc.splitTextToSize(clientAddressVal || "____________________", clientBoxW - (clientBoxX + 72 - clientBoxX) - 8);
+                    doc.text(addressLines, clientBoxX + 72, lineY);
+
+                    y = clientBoxY + 38 + (addressLines.length - 1) * 6 + 6;
+
+                    // Quotation title and table using autoTable
+                    doc.setFontSize(14); doc.setFont("times", "bold");
+                    doc.text("Quotation", 20, y);
+                    y += 6;
+
+                    doc.autoTable({
+                        startY: y,
+                        head: [["Description", "Quantity", "Price Each", "Total"]],
+                        body: tableRows,
+                        theme: "grid",
+                        headStyles: { fillColor: [44, 62, 80], textColor: 255, fontSize: 11 },
+                        styles: { font: "times", fontSize: 10, cellPadding: 5 },
+                        columnStyles: { 1: { halign: "center" }, 2: { halign: "right" }, 3: { halign: "right" } }
                     });
 
-                    setStatus('packing document...');
-                    const blob = await Packer.toBlob(doc);
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `quote_${(new Date()).toISOString().slice(0, 10)}.docx`;
-                    a.click();
-                    setStatus('download started — check your downloads folder');
+                    y = doc.lastAutoTable.finalY + 8;
+
+                    doc.setFontSize(12); doc.setFont(undefined, "bold");
+                    doc.text("Grand Total:", 140, y);
+                    doc.text(`R${grandTotal.toFixed(2)}`, 170, y);
+                    doc.setFont("times", "italic");
+
+                    y += 12;
+                    doc.setFontSize(10);
+                    doc.text("Payment terms: 30 days from invoice date.", 20, y);
+
+                    y += 10;
+                    doc.text("Acceptance:", 20, y);
+                    y += 6;
+                    doc.text("Name: ____________________", 20, y);
+                    y += 6;
+                    doc.text("Signature: ____________________", 20, y);
+                    y += 6;
+                    doc.text("Date: ____________________", 20, y);
+
+                    y += 10;
+                    doc.text("— Generated with MoyoZen Quote Builder —", 60, y);
+
+                    doc.save(`quote_${new Date().toISOString().slice(0, 10)}.pdf`);
+                    setStatus('PDF generated — check downloads folder');
 
                 } catch (err) {
                     console.error(err);
-                    showDebug('Error while generating document:\n\n' + (err.stack || err));
+                    showDebug('Error while generating PDF:\n\n' + (err.stack || err));
                     setStatus('error — see debug');
                 }
             });
 
-            async function createImageRun(file) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-
-                    reader.onload = e => {
-                        const arrayBuffer = e.target.result;
-                        const uint8 = new Uint8Array(arrayBuffer); // <-- define here
-
-                        const img = new Image();
-                        img.onload = () => {
-                            const MAX_WIDTH = 240; // max width in px
-                            const ratio = img.width / img.height;
-                            let width = img.width;
-                            let height = img.height;
-
-                            if (width > MAX_WIDTH) {
-                                width = MAX_WIDTH;
-                                height = Math.round(width / ratio);
-                            }
-
-                            // Use the uint8 defined in the parent scope
-                            const imageRun = new ImageRun({
-                                data: uint8,
-                                transformation: { width, height }
-                            });
-
-                            resolve(imageRun);
-                        };
-                        img.onerror = reject;
-                        img.src = URL.createObjectURL(file);
-                    };
-
-                    reader.onerror = reject;
-                    reader.readAsArrayBuffer(file);
-                });
+            // escape helper
+            function escapeHtml(s) {
+                if (!s && s !== 0) return '';
+                return String(s).replace(/[&<>"']/g, function (m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]; });
             }
+
             addRow();
             setStatus('ready — add rows or use Auto Test, then Generate Quote');
-
         })();
     </script>
 </body>
